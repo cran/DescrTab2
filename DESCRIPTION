@@ -1,8 +1,8 @@
 Package: DescrTab2
 Type: Package
 Title: Publication Quality Descriptive Statistics Tables
-Version: 2.0.3
-Date: 2020-12-10
+Version: 2.0.7
+Date: 2021-03-11
 Authors@R: c(person("Jan", "Meis", role = c("aut", "cre"), email="meis@imbi.uni-heidelberg.de", comment = c(ORCID = "0000-0001-5407-7220")),
              person("Lukas", "Baumann", role = c("aut"), comment = c(ORCID = "0000-0001-7931-7470")),
              person("Maximilian", "Pilz", role = c("aut"), comment = c(ORCID = "0000-0002-9685-1613")),
@@ -32,7 +32,7 @@ Encoding: UTF-8
 URL: https://imbi-heidelberg.github.io/DescrTab2/
 BugReports: https://github.com/imbi-heidelberg/DescrTab2/issues
 NeedsCompilation: no
-Packaged: 2020-12-14 11:57:54 UTC; janme
+Packaged: 2021-03-14 09:05:28 UTC; janme
 Author: Jan Meis [aut, cre] (<https://orcid.org/0000-0001-5407-7220>),
   Lukas Baumann [aut] (<https://orcid.org/0000-0001-7931-7470>),
   Maximilian Pilz [aut] (<https://orcid.org/0000-0002-9685-1613>),
@@ -41,4 +41,4 @@ Author: Jan Meis [aut, cre] (<https://orcid.org/0000-0001-5407-7220>),
   Kevin Kunzmann [ctb]
 Maintainer: Jan Meis <meis@imbi.uni-heidelberg.de>
 Repository: CRAN
-Date/Publication: 2020-12-16 10:00:05 UTC
+Date/Publication: 2021-03-15 11:00:02 UTC

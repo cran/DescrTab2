@@ -47,7 +47,7 @@ output: pdf_document
 No special preamble needed. Make sure you have pandoc version >= 2.0 installed on your system.
 
 ## Global print_format option
-In order for `DescrTab2` to work properly with your document type of choice, you need to set the `printFormat` options, preferably right at the start of your document. You can do this by typing:
+In order for `DescrTab2` to work properly with your document type of choice, you need to set the `print_format` options, preferably right at the start of your document. You can do this by typing:
 
 ```{r, echo=TRUE, message=FALSE}
 options(print_format = "html") # or = "word" or "tex", depending on your document type
@@ -65,7 +65,7 @@ dat %<>% mutate(food= c("fries", "wedges") %>% sample(150, TRUE) %>% factor())
 ```
 
 
-Make sure you include the DescrTab library by typing 
+Make sure you include the DescrTab2 library by typing 
 
 ```{r, echo=TRUE}
 library(DescrTab2)
@@ -98,7 +98,7 @@ descr(dat) %>% print() %>% knitr::knit_print()
 
 When producing word tables in this fashion, you must *not* have the `results='asis'` chunk option set.
 
-Note that `DescrTab2` can also produce console output! In fact, this is the default setting (i.e. if the global `DescrTabFormat` is not specified)
+Note that `DescrTab2` can also produce console output! In fact, this is the default setting (i.e. if the global `print_format` is not specified)
 
 
 ## Accessing table elements
@@ -146,7 +146,7 @@ descr(dat, "animal")
 ```
 
 ## Different tests
-There are a lot of different tests available. Check out the test_choice vignette for details: `vignette("test_choice_tree", "DescrTab2")`, or look at https://imbi-heidelberg.github.io/DescrTab2/articles/test_choice_tree_html.html
+There are a lot of different tests available. Check out the test_choice vignette for details: https://imbi-heidelberg.github.io/DescrTab2/articles/test_choice_tree_pdf.pdf
 
 Here are some different tests in action:
 
@@ -159,9 +159,14 @@ descr(dat %>% select(-"Species"), "animal", test_options = list(exact=TRUE, nonp
 descr(dat %>% select(c("Species", "Sepal.Length")), "Species", test_options = list(nonparametric=TRUE))
 ```
 
+## Paired observations
+
+In situations with paired data, the `group` variable usually denotes the timing of the measurement (e.g. "before" and "after" or "time 1", "time 2", etc.). In these scenarios, you need an additional index variable that specifies which observations from the different timepoints should be paired. The `test_options =list(paired=TRUE, indices = <Character name of index variable name or vector of indices>)` option can be used to specify the pairing indices, see the example below. DescrTab2 only works with data in "long format", see e.g. `?reshape` or `?tidyr::pivot_longer` for information on how to transoform your data from wide to long format.
 
 ```{r, results='asis'}
-descr(dat %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices=rep(1:50, 3)))
+descr(dat %>% mutate(animal = fct_recode(animal, Before="Fish", After="Mammal")) %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices=rep(1:75, each=2)))
+
+descr(dat %>% mutate(animal = fct_recode(animal, Before="Fish", After="Mammal"), idx = rep(1:75, each=2)) %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices="idx" ))
 ```
 
 ## Significant digits
@@ -204,8 +209,7 @@ descr(dat, "Species", format_options = c(combine_mean_sd=TRUE))
 ```
 
 
-## Omitting p values
-
+## Omitting p-values
 You can declare the `format_options = list(print_p = FALSE)` option to omit p-values:
 
 ```{r, results='asis'}
@@ -220,7 +224,6 @@ descr(dat, "animal", format_options = list(print_CI = FALSE))
 
 
 ## Printing without results='asis'
-
 Sometimes, e.g. if you have a loop inside your R-chunk and you want to plot graphics in between descriptive tables, it is necessary not to have the results='asis' option. You can still use DescrTab2 with the following commands:
 
 ````markdown

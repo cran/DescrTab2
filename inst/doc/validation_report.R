@@ -206,6 +206,35 @@ chisq.test(dat$gender, dat$party)
 chisq.test(table(dat$gender))
 chisq.test(table(dat$party))
 
+dat <- tibble(
+  
+  a = factor(c(0,
+               0,
+               1,
+               1,
+               0,
+               0,
+               0,
+               0,
+               0,
+               0,
+               1)),
+  b = factor(c(1,
+               1,
+               1,
+               1,
+               1,
+               1,
+               1,
+               0,
+               0,
+               1,
+               0))
+
+)
+
+descr(dat, "b")
+
 
 ## ----chisq.test SAS, echo=FALSE, results='asis'-------------------------------
 URS_ID <- "chisq.test"

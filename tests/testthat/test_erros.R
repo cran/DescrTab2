@@ -3,8 +3,6 @@ context("Test input that should produce errors.")
 library(magrittr)
 library(tibble)
 
-test_on_cran <- TRUE
-
 test_that("Empty dataset produces error",
           {
             expect_error(descr(tibble()))

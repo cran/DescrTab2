@@ -43,8 +43,6 @@ test_that("Confidence intervals",
           })
 
 
-
-
 test_that("Ommit summary stats",
           expect_error(
             descr(
@@ -178,6 +176,12 @@ test_that("combine_mean_sd works",
           ) %>% print(silent = TRUE),
           NA))
 
+test_that("combine_median_Q1_Q3 works",
+          expect_error(descr(
+            iris, format_options = c(combine_median_Q1_Q3 = TRUE)
+          ) %>% print(silent = TRUE),
+          NA))
+
 test_that("warnings about unused variable names work",
           {
           expect_warning(descr(iris, var_labels=c(a="b"))%>%
@@ -225,6 +229,11 @@ test_that("reshape_rows in var_options is properly filled with default arguments
               print(silent = TRUE)
             , NA)
 
+            expect_error(descr(iris, var_options = list(Sepal.Length = list(
+              format_options = list(combine_median_Q1_Q3 = TRUE)
+            ))) %>%
+              print(silent = TRUE)
+            , NA)
           })
 
 
@@ -253,6 +262,40 @@ test_that("Settings to determine the number of digits for perecent numbers work"
           expect_error(descr(iris, format_options=list(percent_accuracy=0.1)) %>% print(silent=TRUE), NA)
           }
             )
+
+
+
+
+test_that("frequency formatting options work",
+          {
+            expect_error(descr(dat, "Species", format_options = list(absolute_relative_frequency_mode="both")) %>%
+                           print(silent = TRUE), NA)
+            expect_error(descr(dat, "Species", format_options = list(absolute_relative_frequency_mode="only_absolute")) %>%
+                           print(silent = TRUE), NA)
+            expect_error(descr(dat, "Species", format_options = list(absolute_relative_frequency_mode="only_relative")) %>%
+                           print(silent = TRUE), NA)
+          }
+)
+
+test_that("row_percent works",
+          {
+            expect_error(descr(dat, "Species", format_options = list(row_percent=TRUE)) %>%
+                           print(silent = TRUE), NA)
+
+          }
+)
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

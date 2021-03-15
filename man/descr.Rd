@@ -25,13 +25,15 @@ descr(
     digits = 2, scientific = 3)),
   format_p = scales::pvalue_format(),
   format_options = list(print_p = TRUE, print_CI = TRUE, combine_mean_sd = FALSE,
-    omit_Nmiss_if_0 = TRUE, omit_missings_in_group = TRUE, percent_accuracy = NULL,
-    omit_missings_in_categorical_var = FALSE, categorical_missing_percent_mode =
-    c("no_missing_percent", "missing_as_regular_category",
-    "missing_as_separate_category")),
+    combine_median_Q1_Q3 = FALSE, omit_Nmiss_if_0 = TRUE, omit_missings_in_group = TRUE,
+    percent_accuracy = NULL, percent_suffix = "\%", row_percent = FALSE,
+    Nmiss_row_percent = FALSE, absolute_relative_frequency_mode = c("both",
+    "only_absolute", "only_relative"), omit_missings_in_categorical_var = FALSE,
+    categorical_missing_percent_mode = c("no_missing_percent",
+    "missing_as_regular_category", "missing_as_separate_category")),
   test_options = list(paired = FALSE, nonparametric = FALSE, exact = FALSE, indices =
     c(), include_group_missings_in_test = FALSE, include_categorical_missings_in_test =
-    FALSE, test_override = NULL),
+    FALSE, test_override = NULL, additional_test_args = list()),
   reshape_rows = list(`Q1 - Q3` = list(args = c("Q1", "Q3"), fun = function(Q1, Q3)
     paste0(Q1, " -- ", Q3)), `min - max` = list(args = c("min", "max"), fun =
     function(min, max) paste0(min, " -- ", max))),
@@ -75,7 +77,9 @@ pretty summary tables.
 Generate a list of descriptive statistics. By default, the function calculates summary statistics such as mean,
 standard deviation, quantiles, minimum and maximum for continuous variables and relative and absolute frequencies
 for categorical variables. Also calculates p-values for an appropriately chosen statistical test.
-For two-group comparisons, confidence intervals for appropriate summary measures of group differences are calculated aswell.
+For two-group comparisons, confidence intervals for appropriate summary measures of group differences are calculated aswell. In particular,
+Wilson score intervals [1] from \link[stats]{prop.test} are used for categorical variables with 2 levels, confidence intervals from \link[stats]{t.test}
+are used for continuous variables and confidence intervals for the Hodge-Lehman estimator [2] from \link[stats]{wilcox.test} are used for ordinal variables.
 }
 \section{Labels}{
 
@@ -101,11 +105,24 @@ Further formatting options can be specified in the \code{format_options} list. I
 \item{\code{print_CI}}{ (logical) controls whether to print the confidence intervals for group-differences.}
 \item{\code{combine_mean_sd}}{ (logical) controls whether to combine the mean and sd row into one mean ± sd row. This is a
 shortcut argument for the specification of an appropriate entry in the \code{reshape_rows} argument.}
+\item{\code{combine_median_Q1_Q3}}{ (logical) controls whether to combine the median, Q1 and Q3 row into one median (Q1, Q3) row. This is a
+shortcut argument for the specification of an appropriate entry in the \code{reshape_rows} argument.}
 \item{\code{omit_Nmiss_if_0}}{ (logical)  controls whether to omit the Nmiss row in continuous variables there are no missings in the variable.}
 \item{\code{omit_missings_in_group}}{ (logical)  controls whether to omit all observations where the group variable is missing.}
 \item{\code{percent_accuracy}}{ (numeric)  A number to round to. Use (e.g.) 0.01 to show 2 decimal places of precision. If NULL, the default, uses a heuristic that
 should ensure breaks have the minimum number of digits needed to show the difference between adjacent values. See documentation of scales::label_percent}
-\item{\code{omit_missings_in_categorical_var}} (logical) controls whether to omit missing values in categorical variables completely.
+\item{\code{percent_suffix}}{ (character) the symbol to be used where "\%" is appropriate, sensible choices are usually "\%" (default) or "" (i.e., empty string) }
+\item{\code{row_percent}}{ (logical) controls wheter percentages of regular categorical variables should be calculated column-wise (default) or row-wise}
+\item{\code{Nmiss_row_percent}}{ (logical) controls whether percentages of the "Nmiss"-statistic (number of missing values) should be calculated column-wise (default) or row-wise}
+\item{\code{absolute_relative_frequency_mode}}{ (character)  controls how to display frequencies.
+It may be set to one of the following options:
+\itemize{
+\item{\code{"both"}}{ will display absolute and relative frequencies.}
+\item{\code{"only_absolute"}}{ will only display absolute frequencies. }
+\item{\code{"only_relative"}}{ will only display relative frequencies. }
+  }
+ }
+\item{\code{omit_missings_in_categorical_var}}{ (logical) controls whether to omit missing values in categorical variables completely.}
 \item{\code{categorical_missing_percent_mode}}{ (character)  controls how to display percentages in categorical variables with a (Missing) category.
 It may be set to one of the following options:
 \itemize{
@@ -127,9 +144,13 @@ and "(Missing)" with 10 counts, they will become "A": 10 (50\%), "B": 10 (50\%),
 
 \code{test_options} is a named list with test options. It's members \code{paired},  \code{nonparametric}, and
 \code{exact} (logicals) control which test in the corresponding situation. For details, check out the vignette:
-\code{vignette("test_choice_tree", "DescrTab2")}. The \code{test_options = list(test_override="<some test name>")} option can be specified to force usage of a
+\url{https://imbi-heidelberg.github.io/DescrTab2/articles/test_choice_tree_pdf.pdf}. The \code{test_options = list(test_override="<some test name>")} option can be specified to force usage of a
 specific test. This will produce errors if the data does not allow calculation of that specific test, so be wary.
-Use \code{print_test_names()} to see a list of all available test names.
+Use \code{print_test_names()} to see a list of all available test names. If \code{paired = TRUE} is specified, you need to supply an index variable
+\code{indices} that specifies which datapoints in your dataset are paired. \code{indices} may either be a length one character vector that describes
+the name of the index variable in your dataset, or a vector containing the respective indices. See \url{https://imbi-heidelberg.github.io/DescrTab2/articles/usage_guide.html#Paired-observations-1}
+for a bit more explanation. The optional list \code{additional_test_args} can be used to pass arguments along to test functions,
+e.g. \code{additional_test_args=list(correct=TRUE)} will request continuity correction if available.
 }
 
 \section{Customization for single variables}{
@@ -188,4 +209,10 @@ print(DescrList)
 descr(iris, "Species")
 
 
+}
+\references{
+[1] Wilson, E. B. (1927). "Probable inference, the law of succession, and statistical inference". Journal of the American Statistical Association. 22 (158): 209-212. doi:10.1080/01621459.1927.10502953. JSTOR 2276774
+
+
+[2] Hodges, J. L.; Lehmann, E. L. (1963). "Estimation of location based on ranks". Annals of Mathematical Statistics. 34 (2): 598-611. doi:10.1214/aoms/1177704172. JSTOR 2238406. MR 0152070. Zbl 0203.21105. PE euclid.aoms/1177704172
 }

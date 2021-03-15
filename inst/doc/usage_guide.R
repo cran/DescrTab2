@@ -46,7 +46,9 @@ descr(dat %>% select(-"Species"), "animal", test_options = list(exact=TRUE, nonp
 descr(dat %>% select(c("Species", "Sepal.Length")), "Species", test_options = list(nonparametric=TRUE))
 
 ## ---- results='asis'----------------------------------------------------------
-descr(dat %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices=rep(1:50, 3)))
+descr(dat %>% mutate(animal = fct_recode(animal, Before="Fish", After="Mammal")) %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices=rep(1:75, each=2)))
+
+descr(dat %>% mutate(animal = fct_recode(animal, Before="Fish", After="Mammal"), idx = rep(1:75, each=2)) %>% select(-"Species"), "animal", test_options = list(paired=TRUE, indices="idx" ))
 
 ## ---- results='asis'----------------------------------------------------------
 descr(dat, "Species", format_summary_stats = list(mean=function(x)formatC(x, digits = 4)) )
