@@ -1,10 +1,17 @@
-context("Output tables to the console")
-library(magrittr)
+library(magrittr, quietly = TRUE, warn.conflicts = FALSE)
 
 
 dat <- iris[iris$Species != "setosa",]
 dat$Species <- factor(as.character(dat$Species))
 dat$cat_var <- c("a", "b") %>% rep(50) %>% factor()
+
+custom_ttest2 <- list(
+  name = "custom t-test",
+  abbreviation = "custom",
+  p = function(var, group) {
+    return(t.test(var ~ group, data.frame(var = var, group = group))$p.value)
+  }
+)
 
 test_that("numeric output does not produce errors.", {
   expect_error(descr(iris) %>% print(silent = TRUE, print_format = "numeric"), NA)
@@ -20,6 +27,18 @@ test_that("numeric output does not produce errors.", {
   expect_error(descr(dat,
                      "Species") %>% print(silent = TRUE, print_format = "numeric"),
                NA)
+  expect_error(descr(dat,
+                    "Species",
+                    format_options = list (print_CI = FALSE)) %>% print(silent = TRUE, print_format = "numeric"),
+              NA)
+  expect_error(
+    descr(iris %>% mutate(Species = fct_collapse(Species, setosa = c("setosa", "versicolor"))),
+    "Species",
+    var_options = list(Sepal.Length = list(test_override = custom_ttest2))
+  ) %>% 
+  print(print_format="numeric", silent = TRUE),
+    NA
+  )
 })
 
 verify_output(

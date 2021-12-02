@@ -142,7 +142,7 @@ descr(dat, "time", test_options = list(indices=idx, paired=TRUE))
 
 
 ## ----CochranQTest SAS, echo=FALSE, results='asis'-----------------------------
-URS_ID <- "CochranQTest"
+URS_ID <- "CochraneQTest"
 sas_html <- here::here(
     "vignettes",
     "validation_report",
@@ -176,8 +176,11 @@ dat <-
     rep("Approve", 86),
     rep("Disapprove", 570)
   ))
-mcnemar.test(dat$x, dat$y, correct = FALSE)
 
+
+
+## ----mcnemar.test2------------------------------------------------------------
+mcnemar.test(dat$x, dat$y, correct = FALSE)
 
 ## ----mcnemar.test SAS, echo=FALSE, results='asis'-----------------------------
 URS_ID <- "mcnemar.test"
@@ -193,7 +196,7 @@ if(file.exists(sas_html)){
   shiny::includeHTML(sas_html)
 }
 
-## ----chisq.test, results='asis'-----------------------------------------------
+## ----chisq.test1, results='asis'----------------------------------------------
 
 dat <- tibble(gender=c(rep("F",sum(c(762, 327, 468)) ), rep("M", sum( c(484, 239, 477)))),
               party=c(rep("Democrat", 762), rep("Independent", 327), rep("Republican", 468),
@@ -202,10 +205,12 @@ dat <- tibble(gender=c(rep("F",sum(c(762, 327, 468)) ), rep("M", sum( c(484, 239
 descr(dat, "gender")
 descr(dat)
 
+## ----chisq.test2--------------------------------------------------------------
 chisq.test(dat$gender, dat$party)
 chisq.test(table(dat$gender))
 chisq.test(table(dat$party))
 
+## ----chisq.test3, results='asis'----------------------------------------------
 dat <- tibble(
   
   a = factor(c(0,
@@ -232,9 +237,7 @@ dat <- tibble(
                0))
 
 )
-
 descr(dat, "b")
-
 
 ## ----chisq.test SAS, echo=FALSE, results='asis'-------------------------------
 URS_ID <- "chisq.test"
@@ -277,8 +280,9 @@ if(file.exists(sas_html)){
 ## ----aov, results='asis'------------------------------------------------------
 
 dat <- data.frame(
-    y = c(449, 413, 326, 409, 358, 291, 341, 278, 312)/12,
-    P = ordered(gl(3, 3)), N = ordered(gl(3, 1, 9))
+  y = npk$yield,
+  P = ordered(gl(3, 24)),
+  N = ordered(gl(3, 1, 24))
 )
               
 descr(dat[, c("y", "P")], "P") 
@@ -331,9 +335,11 @@ if(file.exists(sas_html)){
 dat <- tibble(gender=factor(c("M", "M", "M", "M", "M", "M", "F", "F", "F", "F", "F")),
               party=factor(c("A", "A", "B", "B", "B", "B", "A", "A", "A", "B", "B")))
 descr(dat, "gender", test_options = c(exact=TRUE))
-exact2x2::boschloo(3, 5, 2, 6, tsmethod="central")
 
 ## ----boschloo2----------------------------------------------------------------
+exact2x2::boschloo(3, 5, 2, 6, tsmethod="central")
+
+## ----boschloo3----------------------------------------------------------------
 exact2x2::boschloo(3, 5, 2, 6, tsmethod="minlike")
 Exact::exact.test(table(dat), method="boschloo", to.plot = FALSE)
 

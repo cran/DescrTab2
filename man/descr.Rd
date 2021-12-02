@@ -15,28 +15,31 @@ descr(
     DescrTab2:::.Q1, Q3 = DescrTab2:::.Q3, min = DescrTab2:::.min, max =
     DescrTab2:::.max),
   summary_stats_cat = list(),
-  format_summary_stats = list(N = function(x) format(x, digits = 2, scientific = 3),
-    Nmiss = function(x) format(x, digits = 2, scientific = 3), mean = function(x)
-    format(x, digits = 2, scientific = 3), sd = function(x) format(x, digits = 2,
-    scientific = 3), median = function(x) format(x, digits = 2, scientific = 3), Q1 =
-    function(x) format(x, digits = 2, scientific = 3), Q3 = function(x) format(x, digits
-    = 2, scientific = 3), min = function(x) format(x, digits = 2, scientific = 3), max =
-    function(x) format(x, digits = 2,      scientific = 3), CI = function(x) format(x,
-    digits = 2, scientific = 3)),
+  format_summary_stats = list(N = function(x) {     format(x, digits = 2, scientific =
+    3) }, mean = function(x) {     format(x, digits = 2, scientific = 3) }, sd =
+    function(x) {     format(x, digits = 2, scientific = 3) }, median = function(x) {    
+    format(x, digits = 2, scientific = 3) }, Q1 = function(x) {     format(x, digits = 2,
+    scientific = 3) }, Q3 = function(x) {     format(x, digits = 2, scientific = 3) },
+    min = function(x) {     format(x, digits = 2, scientific = 3) }, max = function(x) { 
+       format(x, digits = 2, scientific = 3) }, CI = function(x) {     format(x, digits =
+    2, scientific = 3) }),
   format_p = scales::pvalue_format(),
-  format_options = list(print_p = TRUE, print_CI = TRUE, combine_mean_sd = FALSE,
-    combine_median_Q1_Q3 = FALSE, omit_Nmiss_if_0 = TRUE, omit_missings_in_group = TRUE,
-    percent_accuracy = NULL, percent_suffix = "\%", row_percent = FALSE,
-    Nmiss_row_percent = FALSE, absolute_relative_frequency_mode = c("both",
-    "only_absolute", "only_relative"), omit_missings_in_categorical_var = FALSE,
-    categorical_missing_percent_mode = c("no_missing_percent",
-    "missing_as_regular_category", "missing_as_separate_category")),
+  format_options = list(print_Total = NULL, print_p = TRUE, print_CI = TRUE,
+    combine_mean_sd = FALSE, combine_median_Q1_Q3 = FALSE, omit_factor_level = "none",
+    omit_Nmiss_if_0 = TRUE, omit_missings_in_group = TRUE, percent_accuracy = NULL,
+    percent_suffix = "\%", row_percent = FALSE, Nmiss_row_percent = FALSE,
+    absolute_relative_frequency_mode = c("both", "only_absolute", "only_relative"),
+    omit_missings_in_categorical_var = FALSE, categorical_missing_percent_mode =
+    c("no_missing_percent", "missing_as_regular_category",     
+    "missing_as_separate_category"), caption = NULL, replace_empty_string_with_NA = TRUE,
+    categories_first_summary_stats_second = FALSE),
   test_options = list(paired = FALSE, nonparametric = FALSE, exact = FALSE, indices =
-    c(), include_group_missings_in_test = FALSE, include_categorical_missings_in_test =
-    FALSE, test_override = NULL, additional_test_args = list()),
-  reshape_rows = list(`Q1 - Q3` = list(args = c("Q1", "Q3"), fun = function(Q1, Q3)
-    paste0(Q1, " -- ", Q3)), `min - max` = list(args = c("min", "max"), fun =
-    function(min, max) paste0(min, " -- ", max))),
+    c(), guess_id = FALSE, include_group_missings_in_test = FALSE,
+    include_categorical_missings_in_test = FALSE, test_override = NULL,
+    additional_test_args = list(), boschloo_max_n = 200),
+  reshape_rows = list(`Q1 - Q3` = list(args = c("Q1", "Q3"), fun = function(Q1, Q3) {  
+      paste0(Q1, " -- ", Q3) }), `min - max` = list(args = c("min", "max"), fun =
+    function(min, max) {     paste0(min, " -- ", max) })),
   ...
 )
 }
@@ -49,7 +52,7 @@ descr(
 
 \item{var_labels}{named list of variable labels.}
 
-\item{var_options}{A named list of lists. For each variable, you can have special options that apply only to that variable.
+\item{var_options}{named list of lists. For each variable, you can have special options that apply only to that variable.
 These options are specified in this argument. See the details and examples for more explanation.}
 
 \item{summary_stats_cont}{named list of summary statistic functions to be used for numeric variables.}
@@ -62,9 +65,9 @@ These options are specified in this argument. See the details and examples for m
 
 \item{format_options}{named list of formatting options.}
 
-\item{test_options}{A named list of test options.}
+\item{test_options}{named list of test options.}
 
-\item{reshape_rows}{A named list of lists. Describes how to combine different summary statistics into the same row.}
+\item{reshape_rows}{named list of lists. Describes how to combine different summary statistics into the same row.}
 
 \item{...}{further argument to be passed along}
 }
@@ -78,8 +81,8 @@ Generate a list of descriptive statistics. By default, the function calculates s
 standard deviation, quantiles, minimum and maximum for continuous variables and relative and absolute frequencies
 for categorical variables. Also calculates p-values for an appropriately chosen statistical test.
 For two-group comparisons, confidence intervals for appropriate summary measures of group differences are calculated aswell. In particular,
-Wilson score intervals [1] from \link[stats]{prop.test} are used for categorical variables with 2 levels, confidence intervals from \link[stats]{t.test}
-are used for continuous variables and confidence intervals for the Hodge-Lehman estimator [2] from \link[stats]{wilcox.test} are used for ordinal variables.
+Wald confidence intervals from \link[stats]{prop.test} are used for categorical variables with 2 levels, confidence intervals from \link[stats]{t.test}
+are used for continuous variables and confidence intervals for the Hodges-Lehman estimator [1] from \link[stats]{wilcox.test} are used for ordinal variables.
 }
 \section{Labels}{
 
@@ -101,6 +104,8 @@ The \code{format_p} function converts p-values to character strings, e.g. 0.05 -
 
 Further formatting options can be specified in the \code{format_options} list. It contains the following members:
 \itemize{
+\item{\code{print_Total}}{ (logical) controls whether to print the "Total" column. If print_Total = NULL, print_Total will be set
+to TRUE if test_options$paired == FALSE, else it will be set to FALSE.}
 \item{\code{print_p}}{ (logical) controls whether to print the p-value column.}
 \item{\code{print_CI}}{ (logical) controls whether to print the confidence intervals for group-differences.}
 \item{\code{combine_mean_sd}}{ (logical) controls whether to combine the mean and sd row into one mean ± sd row. This is a
@@ -135,8 +140,13 @@ they will become "A": 10 (33\%), "B": 10 (33\%), "(Missing)": 10 (33\% purposes.
 all observations (i.e. #(Missing) / N), but calculates all other catetgory percentages with respect to the non-missing
 observations (e.g. #A / N_nonmissing). This means that if You have three categories: "A" with 10 counts, "B" with 10 counts
 and "(Missing)" with 10 counts, they will become "A": 10 (50\%), "B": 10 (50\%), "(Missing)": 10 (33\%)}
+
+\item{\code{"caption"}}{ adds a table caption to the LaTeX, Word or PDf document}
   }
  }
+\item{\code{replace_empty_string_with_NA}}{ (logical) controls whether empty strings ("") should be replaced
+with missing value (\code{NA_character_}).}
+\item{\code{categories_first_summary_stats_second}}{ (logical) controls whether the categories should be printed first in the summary statistics table.}
 }
 }
 
@@ -144,11 +154,14 @@ and "(Missing)" with 10 counts, they will become "A": 10 (50\%), "B": 10 (50\%),
 
 \code{test_options} is a named list with test options. It's members \code{paired},  \code{nonparametric}, and
 \code{exact} (logicals) control which test in the corresponding situation. For details, check out the vignette:
-\url{https://imbi-heidelberg.github.io/DescrTab2/articles/test_choice_tree_pdf.pdf}. The \code{test_options = list(test_override="<some test name>")} option can be specified to force usage of a
+\url{https://imbi-heidelberg.github.io/DescrTab2/articles/b_test_choice_tree_pdf.pdf}. The \code{test_options = list(test_override="<some test name>")} option can be specified to force usage of a
 specific test. This will produce errors if the data does not allow calculation of that specific test, so be wary.
 Use \code{print_test_names()} to see a list of all available test names. If \code{paired = TRUE} is specified, you need to supply an index variable
 \code{indices} that specifies which datapoints in your dataset are paired. \code{indices} may either be a length one character vector that describes
-the name of the index variable in your dataset, or a vector containing the respective indices. See \url{https://imbi-heidelberg.github.io/DescrTab2/articles/usage_guide.html#Paired-observations-1}
+the name of the index variable in your dataset, or a vector containing the respective indices.
+If you have \code{guess_id} set to \code{TRUE} (the default), \code{DescrTab2} will try to guess
+the ID variable from your dataset and report a warning if it succeedes.
+See \url{https://imbi-heidelberg.github.io/DescrTab2/articles/a_usage_guide.html#Paired-observations-1}
 for a bit more explanation. The optional list \code{additional_test_args} can be used to pass arguments along to test functions,
 e.g. \code{additional_test_args=list(correct=TRUE)} will request continuity correction if available.
 }
@@ -172,19 +185,19 @@ You can replace \code{<Your options here>} with the following options:
 \item{\code{test_override}}{ manually specify the name of the test you want to apply. You can see a list of choices
 by typing \code{print_test_names()}. Possible choices are:
 \itemize{
-\item{\code{"Cochrans Q test"}}{ }
-\item{\code{"McNemars test"}}{ }
+\item{\code{"Cochran's Q test"}}{ }
+\item{\code{"McNemar's test"}}{ }
 \item{\code{"Chi-squared goodness-of-fit test"}}{ }
-\item{\code{"Pearsons chi-squared test"}}{ }
-\item{\code{"Exact McNemars test"}}{ }
-\item{\code{"Boschloos test"}}{ }
-\item{\code{"Wilcoxon one-sample signed-rank test"}}{ }
-\item{\code{"Mann-Whitney U test"}}{ }
-\item{\code{"Kruskal-Wallis one-way ANOVA"}}{ }
-\item{\code{"Students paired t-test"}}{ }
+\item{\code{"Pearson's chi-squared test"}}{ }
+\item{\code{"Exact McNemar's test"}}{ }
+\item{\code{"Boschloo's test"}}{ }
+\item{\code{"Wilcoxon's one-sample signed-rank test"}}{ }
+\item{\code{"Mann-Whitney's U test"}}{ }
+\item{\code{"Kruskal-Wallis's one-way ANOVA"}}{ }
+\item{\code{"Student's paired t-test"}}{ }
 \item{\code{"Mixed model ANOVA"}}{ }
-\item{\code{"Students one-sample t-test"}}{ }
-\item{\code{"Welchs two-sample t-test"}}{ }
+\item{\code{"Student's one-sample t-test"}}{ }
+\item{\code{"Welch's two-sample t-test"}}{ }
 \item{\code{"F-test (ANOVA)"}}{ }
   }
  }
@@ -207,12 +220,7 @@ DescrList <- descr(iris)
 DescrList$variables$results$Sepal.Length$Total$mean
 print(DescrList)
 descr(iris, "Species")
-
-
 }
 \references{
-[1] Wilson, E. B. (1927). "Probable inference, the law of succession, and statistical inference". Journal of the American Statistical Association. 22 (158): 209-212. doi:10.1080/01621459.1927.10502953. JSTOR 2276774
-
-
-[2] Hodges, J. L.; Lehmann, E. L. (1963). "Estimation of location based on ranks". Annals of Mathematical Statistics. 34 (2): 598-611. doi:10.1214/aoms/1177704172. JSTOR 2238406. MR 0152070. Zbl 0203.21105. PE euclid.aoms/1177704172
+[1] Hodges, J. L.; Lehmann, E. L. (1963). "Estimation of location based on ranks". Annals of Mathematical Statistics. 34 (2): 598-611. doi:10.1214/aoms/1177704172. JSTOR 2238406. MR 0152070. Zbl 0203.21105. PE euclid.aoms/1177704172
 }
