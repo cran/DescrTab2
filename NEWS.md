@@ -1,3 +1,32 @@
+# Version 2.1.16
+
+* The requirement that variables need at least 2 nonmissing observations in each group for a significance test to be performed now only applies to numeric variables
+
+# Version 2.1.15
+
+* Reintroduce stretch space to LaTeX tables.
+
+# Version 2.1.14
+
+* Added var_equal option to test_options which will lead to use of Student's t-test instead of Welch's.
+
+# Version 2.1.13
+
+* Added functionality to automatically apply both "usual" summmary statistics aswell as categorical descriptions to ordered variables which can be converted to numeric without warning.
+
+# Version 2.1.12
+
+* Added max_first_col_width format option for LaTeX tables.
+
+# Version 2.1.11
+
+* Some random bugfixes i seem to have forgotten to push.
+
+# Version 2.1.10
+
+* Fix bug where confidence intervals for differences in rates where displayed as differences in row-proportions instead of column-proportions
+* Make error message for improperly matched data more precise
+
 # Version 2.1.9
 
 * Fix a bug where ordered factors were not correctly converted to rank data for non-parametric testing purposes

@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2022-01-20" />
+<meta name="date" content="2022-09-06" />
 
 <title>Usage guidance</title>
 
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 <style type="text/css">
@@ -331,17 +332,27 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Usage guidance</h1>
-<h4 class="date">2022-01-20</h4>
+<h4 class="date">2022-09-06</h4>
 
 
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p><code>DescrTab2</code> is the replacement of the <code>DescrTab</code> package. It supports a variety of different customization options and can be used in .Rmd files in conjunction with knitr.</p>
+<p><code>DescrTab2</code> is the replacement of the
+<code>DescrTab</code> package. It supports a variety of different
+customization options and can be used in .Rmd files in conjunction with
+knitr.</p>
 </div>
 <div id="preamble-settings" class="section level2">
 <h2>Preamble settings</h2>
-<p><code>DescrTab2</code> works in your R-console, as well as in <code>.Rmd</code> documents corresponding to output formats of the type <code>pdf_documument</code>, <code>html_document</code> and <code>word_document</code>. It even supports YAML-headers with multiple output formats! For example, if your YAML-header looks like the example below, <code>DescrTab2</code> should automagically detect the output format depending on the rendering option you choose from the dropdown menue (the arrow next to the “Knit” button on the top menue bar).</p>
+<p><code>DescrTab2</code> works in your R-console, as well as in
+<code>.Rmd</code> documents corresponding to output formats of the type
+<code>pdf_documument</code>, <code>html_document</code> and
+<code>word_document</code>. It even supports YAML-headers with multiple
+output formats! For example, if your YAML-header looks like the example
+below, <code>DescrTab2</code> should automagically detect the output
+format depending on the rendering option you choose from the dropdown
+menue (the arrow next to the “Knit” button on the top menue bar).</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode markdown"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> &quot;DescrTab2 tutorial&quot;</span></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="an">output:</span></span>
@@ -349,14 +360,17 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">  pdf_document: default</span></span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">  html_document: default</span></span>
 <span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span></code></pre></div>
-<p>Required LaTeX packages should be loaded automatically as well when rendering as a pdf.</p>
+<p>Required LaTeX packages should be loaded automatically as well when
+rendering as a pdf.</p>
 </div>
 <div id="getting-started" class="section level2">
 <h2>Getting started</h2>
 <p>Make sure you include the DescrTab2 library by typing</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DescrTab2)</span></code></pre></div>
-<p>somewhere in the document before you use it. You are now ready to go!</p>
-<p>We will use two <code>tidyverse</code> libraries for data manipulation and a the following dataset for instructive purposes:</p>
+<p>somewhere in the document before you use it. You are now ready to
+go!</p>
+<p>We will use two <code>tidyverse</code> libraries for data
+manipulation and a the following dataset for instructive purposes:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr, <span class="at">warn.conflicts =</span> <span class="cn">FALSE</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(forcats)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
@@ -574,18 +588,25 @@ wedges
 </div>
 <div id="accessing-table-elements" class="section level2">
 <h2>Accessing table elements</h2>
-<p>The object returned from the <code>descr</code> function is basically just a named list. You may be interested in referencing certain summary statistics from the table in your document. To do this, you can save the list returned by <code>descr</code>:</p>
+<p>The object returned from the <code>descr</code> function is basically
+just a named list. You may be interested in referencing certain summary
+statistics from the table in your document. To do this, you can save the
+list returned by <code>descr</code>:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>my_table <span class="ot">&lt;-</span> <span class="fu">descr</span>(dat)</span></code></pre></div>
-<p>You can then access the elements of the list using the <code>$</code> operator.</p>
+<p>You can then access the elements of the list using the <code>$</code>
+operator.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>my_table<span class="sc">$</span>variables<span class="sc">$</span>Sepal.Length<span class="sc">$</span>results<span class="sc">$</span>Total<span class="sc">$</span>mean</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; NULL</span></span></code></pre></div>
-<p>Rstudios autocomplete suggestions are very helpful when navigating this list.</p>
-<p>The <code>print</code> function returns a formatted version of this list, which you can also save and access using the same syntax.</p>
+<p>Rstudios autocomplete suggestions are very helpful when navigating
+this list.</p>
+<p>The <code>print</code> function returns a formatted version of this
+list, which you can also save and access using the same syntax.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>my_table <span class="ot">&lt;-</span> <span class="fu">descr</span>(dat) <span class="sc">%&gt;%</span> <span class="fu">print</span>(<span class="at">silent=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="specifying-a-group" class="section level2">
 <h2>Specifying a group</h2>
-<p>Use the <code>group</code> option to specify the name of a grouping variable in your data:</p>
+<p>Use the <code>group</code> option to specify the name of a grouping
+variable in your data:</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>)</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -866,7 +887,8 @@ wedges
 </div>
 <div id="assigning-labels" class="section level2">
 <h2>Assigning labels</h2>
-<p>Use the <code>group_labels</code> option to assign group labels and the <code>var_labels</code> option to assign variable labels:</p>
+<p>Use the <code>group_labels</code> option to assign group labels and
+the <code>var_labels</code> option to assign variable labels:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>, <span class="at">group_labels=</span><span class="fu">list</span>(<span class="at">setosa=</span><span class="st">&quot;My custom group label&quot;</span>), <span class="at">var_labels =</span> <span class="fu">list</span>(<span class="at">Sepal.Length =</span> <span class="st">&quot;My custom variable label&quot;</span>))</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -1147,7 +1169,8 @@ wedges
 </div>
 <div id="assigning-a-table-caption" class="section level2">
 <h2>Assigning a table caption</h2>
-<p>Use the <code>caption</code> member of the <code>format_options</code> argument to assign a table caption:</p>
+<p>Use the <code>caption</code> member of the
+<code>format_options</code> argument to assign a table caption:</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>, <span class="at">format_options =</span> <span class="fu">list</span>(<span class="at">caption=</span><span class="st">&quot;Description of our example dataset.&quot;</span>))</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <caption>
@@ -1431,7 +1454,8 @@ wedges
 </div>
 <div id="confidence-intervals-for-two-group-comparisons" class="section level2">
 <h2>Confidence intervals for two group comparisons</h2>
-<p>For 2-group comparisons, decrtab automatically calculates confidence intervals for differences in effect measures:</p>
+<p>For 2-group comparisons, decrtab automatically calculates confidence
+intervals for differences in effect measures:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;animal&quot;</span>)</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -1723,7 +1747,8 @@ wedges
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PWa</sup> CI for difference in proportions derived from a normal (“Wald”) approximation
+<sup>PWa</sup> CI for difference in proportions derived from a normal
+(“Wald”) approximation
 </td>
 </tr>
 </tfoot>
@@ -1731,7 +1756,8 @@ wedges
 </div>
 <div id="different-tests" class="section level2">
 <h2>Different tests</h2>
-<p>There are a lot of different tests available. Check out the test_choice vignette for details: <a href="https://imbi-heidelberg.github.io/DescrTab2/articles/b_test_choice_tree_pdf.pdf" class="uri">https://imbi-heidelberg.github.io/DescrTab2/articles/b_test_choice_tree_pdf.pdf</a></p>
+<p>There are a lot of different tests available. Check out the
+test_choice vignette for details: <a href="https://imbi-heidelberg.github.io/DescrTab2/articles/b_test_choice_tree_pdf.pdf" class="uri">https://imbi-heidelberg.github.io/DescrTab2/articles/b_test_choice_tree_pdf.pdf</a></p>
 <p>Here are some different tests in action:</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">&quot;Species&quot;</span>), <span class="st">&quot;animal&quot;</span>, <span class="at">test_options =</span> <span class="fu">list</span>(<span class="at">exact=</span><span class="cn">TRUE</span>, <span class="at">nonparametric=</span><span class="cn">TRUE</span>))</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
@@ -1964,7 +1990,8 @@ wedges
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PUnc</sup> CI for difference in proportions derived from an unconditional exact test
+<sup>PUnc</sup> CI for difference in proportions derived from an
+unconditional exact test
 </td>
 </tr>
 </tfoot>
@@ -2156,7 +2183,16 @@ min - max
 </div>
 <div id="paired-observations" class="section level2">
 <h2>Paired observations</h2>
-<p>In situations with paired data, the <code>group</code> variable usually denotes the timing of the measurement (e.g. “before” and “after” or “time 1”, “time 2”, etc.). In these scenarios, you need an additional index variable that specifies which observations from the different timepoints should be paired. The <code>test_options =list(paired=TRUE, indices = &lt;Character name of index variable name or vector of indices&gt;)</code> option can be used to specify the pairing indices, see the example below. DescrTab2 only works with data in “long format”, see e.g. <code>?reshape</code> or <code>?tidyr::pivot_longer</code> for information on how to transoform your data from wide to long format.</p>
+<p>In situations with paired data, the <code>group</code> variable
+usually denotes the timing of the measurement (e.g. “before” and “after”
+or “time 1”, “time 2”, etc.). In these scenarios, you need an additional
+index variable that specifies which observations from the different
+timepoints should be paired. The
+<code>test_options =list(paired=TRUE, indices = &lt;Character name of index variable name or vector of indices&gt;)</code>
+option can be used to specify the pairing indices, see the example
+below. DescrTab2 only works with data in “long format”, see
+e.g. <code>?reshape</code> or <code>?tidyr::pivot_longer</code> for
+information on how to transoform your data from wide to long format.</p>
 <div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(<span class="at">animal =</span> <span class="fu">fct_recode</span>(animal, <span class="at">Before=</span><span class="st">&quot;Fish&quot;</span>, <span class="at">After=</span><span class="st">&quot;Mammal&quot;</span>)) <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span><span class="st">&quot;Species&quot;</span>), <span class="st">&quot;animal&quot;</span>, <span class="at">test_options =</span> <span class="fu">list</span>(<span class="at">paired=</span><span class="cn">TRUE</span>, <span class="at">indices=</span><span class="fu">rep</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">75</span>, <span class="at">each=</span><span class="dv">2</span>)))</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; You specified paired tests and did not explicitly</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; specify format_options$print_Total. print_Total is set to FALSE.</span></span>
@@ -2361,7 +2397,8 @@ wedges
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PWa</sup> CI for difference in proportions derived from a normal (“Wald”) approximation
+<sup>PWa</sup> CI for difference in proportions derived from a normal
+(“Wald”) approximation
 </td>
 </tr>
 </tfoot>
@@ -2571,7 +2608,8 @@ wedges
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PWa</sup> CI for difference in proportions derived from a normal (“Wald”) approximation
+<sup>PWa</sup> CI for difference in proportions derived from a normal
+(“Wald”) approximation
 </td>
 </tr>
 </tfoot>
@@ -2579,7 +2617,9 @@ wedges
 </div>
 <div id="significant-digits" class="section level2">
 <h2>Significant digits</h2>
-<p>Every summary statistic in DescrTab2 is formatted by a corresponding formatting function. You can exchange these formatting functions as you please:</p>
+<p>Every summary statistic in DescrTab2 is formatted by a corresponding
+formatting function. You can exchange these formatting functions as you
+please:</p>
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>, <span class="at">format_summary_stats =</span> <span class="fu">list</span>(<span class="at">mean=</span><span class="cf">function</span>(x)<span class="fu">formatC</span>(x, <span class="at">digits =</span> <span class="dv">4</span>)) )</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -2860,7 +2900,9 @@ wedges
 </div>
 <div id="omitting-summary-statistics" class="section level2">
 <h2>Omitting summary statistics</h2>
-<p>Let’s say you don’t want to calculate quantiles for your numeric variables. You can specify the <code>summary_stats_cont</code> option to include all summary statistics but quantiles:</p>
+<p>Let’s say you don’t want to calculate quantiles for your numeric
+variables. You can specify the <code>summary_stats_cont</code> option to
+include all summary statistics but quantiles:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>, <span class="at">summary_stats_cont =</span> <span class="fu">list</span>(<span class="at">N =</span> DescrTab2<span class="sc">:::</span>.N, <span class="at">Nmiss =</span> DescrTab2<span class="sc">:::</span>.Nmiss, <span class="at">mean =</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    DescrTab2<span class="sc">:::</span>.mean, <span class="at">sd =</span> DescrTab2<span class="sc">:::</span>.sd, <span class="at">median =</span> DescrTab2<span class="sc">:::</span>.median, <span class="at">min =</span> DescrTab2<span class="sc">:::</span>.min, <span class="at">max =</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    DescrTab2<span class="sc">:::</span>.max))</span></code></pre></div>
@@ -3124,7 +3166,8 @@ wedges
 </div>
 <div id="adding-summary-statistics" class="section level2">
 <h2>Adding summary statistics</h2>
-<p>Let’s say you have a categorical variable, but for some reason it’s levels are numerals and you want to calculate the mean. No problem:</p>
+<p>Let’s say you have a categorical variable, but for some reason it’s
+levels are numerals and you want to calculate the mean. No problem:</p>
 <div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create example dataset</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>dat2 <span class="ot">&lt;-</span> iris</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>dat2<span class="sc">$</span>cat_var <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>) <span class="sc">%&gt;%</span> <span class="fu">sample</span>(<span class="dv">150</span>, <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> <span class="fu">factor</span>()</span>
@@ -3192,6 +3235,26 @@ p
 </tr>
 <tr>
 <td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
+mean
+</td>
+<td style="text-align:center;">
+1.5
+</td>
+<td style="text-align:center;">
+1.6
+</td>
+<td style="text-align:center;">
+1.4
+</td>
+<td style="text-align:center;">
+1.5
+</td>
+<td style="text-align:center;">
+0.083<sup>chi2</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
 1
 </td>
 <td style="text-align:center;">
@@ -3207,7 +3270,6 @@ p
 78 (52%)
 </td>
 <td style="text-align:center;">
-0.083<sup>chi2</sup>
 </td>
 </tr>
 <tr>
@@ -3229,25 +3291,6 @@ p
 <td style="text-align:center;">
 </td>
 </tr>
-<tr>
-<td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
-mean
-</td>
-<td style="text-align:center;">
-1.5
-</td>
-<td style="text-align:center;">
-1.6
-</td>
-<td style="text-align:center;">
-1.4
-</td>
-<td style="text-align:center;">
-1.5
-</td>
-<td style="text-align:center;">
-</td>
-</tr>
 </tbody>
 <tfoot>
 <tr>
@@ -3260,7 +3303,8 @@ mean
 </div>
 <div id="combining-mean-and-sd" class="section level2">
 <h2>Combining mean and sd</h2>
-<p>Use the <code>format_options = list(combine_mean_sd=TRUE)</code> option:</p>
+<p>Use the <code>format_options = list(combine_mean_sd=TRUE)</code>
+option:</p>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;Species&quot;</span>, <span class="at">format_options =</span> <span class="fu">c</span>(<span class="at">combine_mean_sd=</span><span class="cn">TRUE</span>))</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -3522,7 +3566,9 @@ wedges
 </div>
 <div id="omitting-p-values" class="section level2">
 <h2>Omitting p-values</h2>
-<p>You can declare the <code>format_options = list(print_p = FALSE)</code> option to omit p-values:</p>
+<p>You can declare the
+<code>format_options = list(print_p = FALSE)</code> option to omit
+p-values:</p>
 <div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(dat, <span class="st">&quot;animal&quot;</span>, <span class="at">format_options =</span> <span class="fu">list</span>(<span class="at">print_p =</span> <span class="cn">FALSE</span>))</span></code></pre></div>
 <table class="table" style="margin-left: auto; margin-right: auto;border-bottom: 0;">
 <thead>
@@ -3772,7 +3818,8 @@ wedges
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PWa</sup> CI for difference in proportions derived from a normal (“Wald”) approximation
+<sup>PWa</sup> CI for difference in proportions derived from a normal
+(“Wald”) approximation
 </td>
 </tr>
 </tfoot>
@@ -4036,7 +4083,10 @@ wedges
 </div>
 <div id="controling-options-on-a-per-variable-level" class="section level2">
 <h2>Controling options on a per-variable level</h2>
-<p>You can use the <code>var_options</code> list to control formatting and test options on a per-variable basis. Let’s say in the dataset <code>iris</code>, we want that only the <code>Sepal.Length</code> variable has more digits in the mean and a nonparametric test:</p>
+<p>You can use the <code>var_options</code> list to control formatting
+and test options on a per-variable basis. Let’s say in the dataset
+<code>iris</code>, we want that only the <code>Sepal.Length</code>
+variable has more digits in the mean and a nonparametric test:</p>
 <div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(iris, <span class="st">&quot;Species&quot;</span>, <span class="at">var_options =</span> <span class="fu">list</span>(<span class="at">Sepal.Length =</span> <span class="fu">list</span>(</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">format_summary_stats =</span> <span class="fu">list</span>(</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="cf">function</span>(x)</span>
@@ -4595,11 +4645,16 @@ min - max
 </div>
 <div id="use-user-defined-test-statistics" class="section level2">
 <h2>Use user defined test statistics</h2>
-<p><code>DescrTab2</code> has many predefined significance tests, but sometimes you may need to use a custom test. In this case, you can use the test_override option in test_options (or as a part of per variable options, see above). To do so, test_override must be a list with at least 3 members:</p>
+<p><code>DescrTab2</code> has many predefined significance tests, but
+sometimes you may need to use a custom test. In this case, you can use
+the test_override option in test_options (or as a part of per variable
+options, see above). To do so, test_override must be a list with at
+least 3 members:</p>
 <ul>
 <li>the name of the test (e.g. “custom t-test”)</li>
 <li>an abbreviation for this name (e.g. “ct”)</li>
-<li>a function that takes the variable to be analysed and possibly a group variable and returns the p-value.</li>
+<li>a function that takes the variable to be analysed and possibly a
+group variable and returns the p-value.</li>
 </ul>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>custom_ttest <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">&quot;custom t-test&quot;</span>,</span>
@@ -4916,7 +4971,11 @@ min - max
 </div>
 <div id="supress-the-last-factor-level" class="section level2">
 <h2>Supress the last factor level</h2>
-<p>If you have a lot of binary factors, you may want to suppress one of the factor levels to save space. A common use case for this practise is when you analyse questionaires with a great deal of “yes” / “no” items. You can do so by setting the <code>omit_factor_level</code> option to either <code>&quot;first&quot;</code> or <code>&quot;last&quot;</code>.</p>
+<p>If you have a lot of binary factors, you may want to suppress one of
+the factor levels to save space. A common use case for this practise is
+when you analyse questionaires with a great deal of “yes” / “no” items.
+You can do so by setting the <code>omit_factor_level</code> option to
+either <code>&quot;first&quot;</code> or <code>&quot;last&quot;</code>.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">descr</span>(<span class="fu">factor</span>(<span class="fu">c</span>(<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>)), <span class="at">format_options=</span><span class="fu">list</span>(<span class="at">omit_factor_level =</span> <span class="st">&quot;last&quot;</span>))</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; Warning in (function (x, y = NULL, correct = TRUE, p = rep(1/length(x), : Chi-</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; squared approximation may be incorrect</span></span></code></pre></div>
@@ -4978,7 +5037,11 @@ a
 </div>
 <div id="confidence-intervals-as-summary-statistics" class="section level2">
 <h2>Confidence intervals as summary statistics</h2>
-<p>Sometimes it may be a good idea to show the confidence intervals as summary statistics. To do so, you can supply appropriate summary statistics for the confidence intervals with corresponding formatting functions. <code>DescrTab2</code> offers the following predefined CI functions:</p>
+<p>Sometimes it may be a good idea to show the confidence intervals as
+summary statistics. To do so, you can supply appropriate summary
+statistics for the confidence intervals with corresponding formatting
+functions. <code>DescrTab2</code> offers the following predefined CI
+functions:</p>
 <ul>
 <li><code>DescrTab2:::.meanCIlower</code></li>
 <li><code>DescrTab2:::.meanCIupper</code></li>
@@ -5110,26 +5173,6 @@ CI
 </tr>
 <tr>
 <td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
-a
-</td>
-<td style="text-align:center;">
-38 (78%)
-</td>
-<td style="text-align:center;">
-32 (63%)
-</td>
-<td style="text-align:center;">
-70 (70%)
-</td>
-<td style="text-align:center;">
-0.106<sup>chi2</sup>
-</td>
-<td style="text-align:center;">
-[-0.032, 0.38]<sup>PWa</sup>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
 CI
 </td>
 <td style="text-align:center;">
@@ -5140,6 +5183,26 @@ CI
 </td>
 <td style="text-align:center;">
 [60%, 79%]
+</td>
+<td style="text-align:center;">
+0.106<sup>chi2</sup>
+</td>
+<td style="text-align:center;">
+[-0.029, 0.32]<sup>PWa</sup>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;width: 4.2cm; padding-left: 2em;" indentlevel="1">
+a
+</td>
+<td style="text-align:center;">
+38 (78%)
+</td>
+<td style="text-align:center;">
+32 (63%)
+</td>
+<td style="text-align:center;">
+70 (70%)
 </td>
 <td style="text-align:center;">
 </td>
@@ -5221,7 +5284,8 @@ CI
 </tr>
 <tr>
 <td style="padding: 0; " colspan="100%">
-<sup>PWa</sup> CI for difference in proportions derived from a normal (“Wald”) approximation
+<sup>PWa</sup> CI for difference in proportions derived from a normal
+(“Wald”) approximation
 </td>
 </tr>
 <tr>

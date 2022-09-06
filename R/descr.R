@@ -18,6 +18,7 @@ utils::globalVariables(".")
 #' @param var_options named list of lists. For each variable, you can have special options that apply only to that variable.
 #' These options are specified in this argument. See the details and examples for more explanation.
 #' @param summary_stats_cont named list of summary statistic functions to be used for numeric variables.
+#' @param summary_stats_numeric_ord named list of summary statistic function to be used for ordered factor variables which can be converted to numeric.
 #' @param summary_stats_cat named list of summary statistic function to be used for categorical variables.
 #' @param format_summary_stats named list of formatting functions for summary statistics.
 #' @param format_p formatting function for p-values.
@@ -77,14 +78,15 @@ utils::globalVariables(".")
 #' all observations (i.e. #(Missing) / N), but calculates all other catetgory percentages with respect to the non-missing
 #' observations (e.g. #A / N_nonmissing). This means that if You have three categories: "A" with 10 counts, "B" with 10 counts
 #' and "(Missing)" with 10 counts, they will become "A": 10 (50\%), "B": 10 (50\%), "(Missing)": 10 (33\%)}
-#'
-#' \item{\code{"caption"}}{ adds a table caption to the LaTeX, Word or PDf document}
-#'   }
 #'  }
+#'   }
+#' \item{\code{"caption"}}{ adds a table caption to the LaTeX, Word or PDf document}
 #' \item{\code{replace_empty_string_with_NA}}{ (logical) controls whether empty strings ("") should be replaced
 #' with missing value (\code{NA_character_}).}
 #' \item{\code{categories_first_summary_stats_second}}{ (logical) controls whether the categories should be printed first in the summary statistics table.}
+#' \item{\code{max_first_col_width}}{ (numeric) controls the maximum width of the first column in LaTeX tables.}
 #' }
+#'
 #'
 #'
 #' @section Test options:
@@ -131,6 +133,7 @@ utils::globalVariables(".")
 #' \item{\code{"Student's paired t-test"}}{ }
 #' \item{\code{"Mixed model ANOVA"}}{ }
 #' \item{\code{"Student's one-sample t-test"}}{ }
+#' \item{\code{"Student's two-sample t-test"}}{ }
 #' \item{\code{"Welch's two-sample t-test"}}{ }
 #' \item{\code{"F-test (ANOVA)"}}{ }
 #'   }
@@ -185,6 +188,17 @@ descr <-
              Q3 = DescrTab2:::.Q3,
              min = DescrTab2:::.min,
              max = DescrTab2:::.max
+           ),
+           summary_stats_numeric_ord = list(
+             N = DescrTab2:::.factorN,
+             Nmiss = DescrTab2:::.factorNmiss,
+             mean = DescrTab2:::.factormean,
+             sd = DescrTab2:::.factorsd,
+             median = DescrTab2:::.factormedian,
+             Q1 = DescrTab2:::.factorQ1,
+             Q3 = DescrTab2:::.factorQ3,
+             min = DescrTab2:::.factormin,
+             max = DescrTab2:::.factormax
            ),
            summary_stats_cat = list(),
            format_summary_stats = list(
@@ -243,12 +257,14 @@ descr <-
              ),
              caption = NULL,
              replace_empty_string_with_NA = TRUE,
-             categories_first_summary_stats_second = FALSE
+             categories_first_summary_stats_second = FALSE,
+             max_first_col_width = 7.5
            ),
            test_options = list(
              paired = FALSE,
              nonparametric = FALSE,
              exact = FALSE,
+             var_equal = FALSE,
              indices = c(),
              guess_id = FALSE,
              include_group_missings_in_test = FALSE,
@@ -285,9 +301,9 @@ descr <-
     dat %<>% unlabel()
 
     # Coerce all date columns to factors
-    if (isTRUE(any(sapply(dat, function(x) inherits(x, "Date"))))) {
-      warning("Your dataset contains variables of type 'Date'. These are automatically converted to factors")
-      dat %<>% mutate(across(where(function(x) inherits(x, "Date")), function(x) {
+    if (isTRUE(any(sapply(dat, function(x) inherits(x, c("Date", "POSIXt")))))) {
+      warning("Your dataset contains variables of type 'Date' or 'POSIXt'. These are automatically converted to factors")
+      dat %<>% mutate(across(where(function(x) inherits(x, c("Date", "POSIXt"))), function(x) {
         x %>%
           as.factor() %>%
           fct_explicit_na()
@@ -580,6 +596,7 @@ specify format_options$print_Total. print_Total is set to FALSE.")
       `Student's paired t-test` = "tpar",
       `Mixed model ANOVA` = "MiAn",
       `Student's one-sample t-test` = "tt1",
+      `Student's two-sample t-test` = "stt2",
       `Welch's two-sample t-test` = "tt2",
       `F-test (ANOVA)` = "F",
       `Cochran-Armitage's test` = "CocA",
@@ -636,7 +653,7 @@ specify format_options$print_Total. print_Total is set to FALSE.")
 
         tmp_names <-
           setdiff(names(var_options[[var_option_name]][["format_summary_stats"]]), "Nmiss")
-        if (!all(names(var_options[[var_option_name]][["summary_stats"]]) %in% tmp_names)) {
+        if (!all(setdiff(names(var_options[[var_option_name]][["summary_stats"]]), "Nmiss") %in% tmp_names)) {
           warning(
             "All summary stats in var_options must have a corresponding formatting function. Defaulting to as.character"
           )
@@ -780,12 +797,19 @@ specify format_options$print_Total. print_Total is set to FALSE.")
     # Loop over all variables
     for (var_name in names(dat)) {
       var <- dat %>% pull(var_name)
-
-      var_descr <- NULL
+      if (is.ordered(var) && can.be.numeric(var)){
+        summary_stats <- summary_stats_numeric_ord
+      } else if (is.factor(var)){
+        summary_stats <- summary_stats_cat
+      } else if (is.numeric(var)){
+        summary_stats <- summary_stats_cont
+      } else {
+        stop("Unkown variable type.")
+      }
       var_descr <- descr_var(var,
         group_var,
         var_name,
-        if (is.factor(var)) summary_stats_cat else if (is.numeric(var)) summary_stats_cont else stop("Unkown variable type."),
+        summary_stats,
         var_options = var_options[[var_name]],
         test_options
       )
@@ -1360,10 +1384,13 @@ if ("CI_name" %in% names(tibl)) {
 
   tibl <- escape_latex_symbols(tibl, numEscapes = 1)
 
-  width <- min(max(c(
+  width <- min(
+    max(
     (sapply(labels, str_length) + 1) %/% 2,
-    (sapply(tibl[[1]][!indx_varnames], str_length) + 1) %/% 2, 1
-  )), 7.5)
+    (sapply(tibl[[1]][!indx_varnames], str_length) + 1) %/% 2,
+    1
+  ),
+  DescrPrintObj[["format"]][["options"]][["max_first_col_width"]])
 
   # For some reason, names need double escaping
   names(lengths) <- sapply(escape_latex_symbols(tibble(labels), numEscapes = 2)[[1]],
@@ -1374,7 +1401,8 @@ if ("CI_name" %in% names(tibl)) {
   )
   tibl[!indx_varnames, 1] <- sapply(tibl[[1]][!indx_varnames], in_minipage,
     width = paste0(width, "em"),
-    numEscapes = 1
+    numEscapes = 1,
+    strechSpace = TRUE
   )
 
   tex <- tibl[!indx_varnames, ] %>%
@@ -1757,7 +1785,7 @@ create_numeric_subtable <-
            format_summary_stats,
            format_p,
            reshape_rows) {
-    if (isTRUE(format_options[["categories_first_summary_stats_second"]])) {
+    if (!isTRUE(format_options[["categories_first_summary_stats_second"]])) {
       order <- c(1:2)
     } else {
       order <- c(2:1)
@@ -1851,7 +1879,7 @@ create_character_subtable <-
     DescrVarObj_unformatted <- DescrVarObj
     groups <- setdiff(names(DescrVarObj[["results"]]), "Total")
 
-    if (isTRUE(format_options[["categories_first_summary_stats_second"]])) {
+    if (!isTRUE(format_options[["categories_first_summary_stats_second"]])) {
       order <- c(1:2)
     } else {
       order <- c(2:1)
@@ -2244,6 +2272,7 @@ print_test_names <- function() {
     "Student's paired t-test",
     "Mixed model ANOVA",
     "Student's one-sample t-test",
+    "Student's two-sample t-test",
     "Welch's two-sample t-test",
     "Cochran-Armitage's test",
     "Jonckheere-Terpstra's test",
@@ -2343,7 +2372,7 @@ sig_test <- function(var,
         )
       )
       test <- "No test"
-    } else if ((!is.null(group) && !all(table(group) > 1)) || length(var) == 1) {
+    } else if ((!is.null(group) && is.numeric(var) && !all(table(group) > 1)) || length(var) == 1) {
       warning(
         paste0(
           "Skipping test for variable ",
@@ -2395,7 +2424,11 @@ sig_test <- function(var,
         if (n_levels_group == 1) {
           test <- "Student's one-sample t-test"
         } else if (n_levels_group == 2) {
-          test <- "Welch's two-sample t-test"
+          if (isTRUE(test_options[["var_equal"]])){
+            test <- "Student's two-sample t-test"
+          } else {
+            test <- "Welch's two-sample t-test"
+          }
         } else if (n_levels_group >= 3) {
           test <- "F-test (ANOVA)"
         } else {
@@ -2479,6 +2512,7 @@ boschloo_max_n in test_options to a larger value or to NULL."))
       "Student's paired t-test",
       "Mixed model ANOVA",
       "Student's one-sample t-test",
+      "Student's two-sample t-test",
       "Welch's two-sample t-test",
       "F-test (ANOVA)"
     )) {
@@ -2492,7 +2526,8 @@ boschloo_max_n in test_options to a larger value or to NULL."))
       `Wilcoxon two-sample signed-rank test` = {
         good_idx <- names(table(id)[table(id) == 2])
         if (!all(id %in% good_idx)) {
-          warning("Removed paired observations with missings.")
+          warning(paste0("Datapoints with the following IDs are improperly matched and have been removed for p-value calculation: ",
+                         paste(names(table(id)[table(id) != 2]), collapse = ", ")))
         }
         tibl <- tibble(
           var = var,
@@ -2581,7 +2616,8 @@ boschloo_max_n in test_options to a larger value or to NULL."))
       `Student's paired t-test` = {
         good_idx <- names(table(id)[table(id) == 2])
         if (!all(id %in% good_idx)) {
-          warning("Removed paired observations with missings.")
+          warning(paste0("Datapoints with the following IDs are improperly matched and have been removed: ",
+                         paste(names(table(id)[table(id) != 2]), collapse = ", ")))
         }
         tibl <- tibble(
           var = var,
@@ -2645,6 +2681,23 @@ boschloo_max_n in test_options to a larger value or to NULL."))
         )
         list(p = ignore_unused_args(stats::t.test, arglist)$p.value)
       },
+      `Student's two-sample t-test` = {
+        tmp <- tibble(var = var, group = group)
+        arglist <- modifyList(
+          list(
+            formula = var ~ group,
+            var.equal = TRUE,
+            data = tmp
+          ),
+          as.list(test_options[["additional_test_args"]])
+        )
+        tl <- ignore_unused_args(stats::t.test, arglist)
+        list(
+          p = tl$p.value,
+          CI = tl$conf.int,
+          CI_name = "CI for difference in means derived from the t-distribution"
+        )
+      },
       `Welch's two-sample t-test` = {
         tmp <- tibble(var = var, group = group)
         arglist <- modifyList(
@@ -2676,24 +2729,32 @@ boschloo_max_n in test_options to a larger value or to NULL."))
         list(p = pv)
       },
       `Exact McNemar's test` = {
-        tmp <- tibble(
+        good_idx <- names(table(id)[table(id) == 2])
+        if (!all(id %in% good_idx)) {
+          warning(paste0("Datapoints with the following IDs are improperly matched and have been removed: ",
+                         paste(names(table(id)[table(id) != 2]), collapse = ", ")))
+        }
+        tibl <- tibble(
           var = var,
           group = group,
-          idx = test_options[["indices"]]
+          id = id
         )
-        tmp1 <-
-          tmp %>%
-          filter(group == levels(group)[1]) %>%
-          arrange("idx")
-        tmp2 <-
-          tmp %>%
-          filter(group == levels(group)[2]) %>%
-          arrange("idx")
+        tibl %<>% filter(id %in% good_idx)
+        level1 <- levels(group)[1]
+        level2 <- levels(group)[2]
+        x <-
+          tibl %>%
+          filter(group == level1) %>%
+          arrange(id) %>%
+          pull(var)
+        y <-
+          tibl %>%
+          filter(group == level2) %>%
+          arrange(id) %>%
+          pull(var)
 
-        if (any(tmp1$idx != tmp2$idx)) {
-          stop("Your data is not properly matched. Maybe some pairs contain missings?")
-        }
-        cont.table <- table(tmp1$var, tmp2$var)
+        cont.table <- table(x, y)
+
         arglist <- modifyList(
           list(
             x = cont.table,
@@ -2768,7 +2829,7 @@ boschloo_max_n in test_options to a larger value or to NULL."))
         }
         arglist <- modifyList(
           list(
-            x = table(var, group),
+            x = table(group, var),
             conf.int = conf.int
           ),
           as.list(test_options[["additional_test_args"]])
@@ -2787,24 +2848,31 @@ boschloo_max_n in test_options to a larger value or to NULL."))
         }
       },
       `McNemar's test` = {
-        tmp <- tibble(
+        good_idx <- names(table(id)[table(id) == 2])
+        if (!all(id %in% good_idx)) {
+          warning(paste0("Datapoints with the following IDs are improperly matched and have been removed: ",
+                         paste(names(table(id)[table(id) != 2]), collapse = ", ")))
+        }
+        tibl <- tibble(
           var = var,
           group = group,
-          idx = test_options[["indices"]]
+          id = id
         )
-        tmp1 <-
-          tmp %>%
-          filter(group == levels(group)[1]) %>%
-          arrange("idx")
-        tmp2 <-
-          tmp %>%
-          filter(group == levels(group)[2]) %>%
-          arrange("idx")
+        tibl %<>% filter(id %in% good_idx)
+        level1 <- levels(group)[1]
+        level2 <- levels(group)[2]
+        x <-
+          tibl %>%
+          filter(group == level1) %>%
+          arrange(id) %>%
+          pull(var)
+        y <-
+          tibl %>%
+          filter(group == level2) %>%
+          arrange(id) %>%
+          pull(var)
 
-        if (any(tmp1$idx != tmp2$idx)) {
-          stop("Your data is not properly matched. Maybe some pairs contain missings?")
-        }
-        cont.table <- table(tmp1$var, tmp2$var)
+        cont.table <- table(x, y)
 
         arglist <- modifyList(
           list(
@@ -2817,7 +2885,7 @@ Use Exact McNemar's test if you want confidence intervals which use the test sta
 exact McNemar's test.")
         list(
           p = ignore_unused_args(stats::mcnemar.test, arglist)$p.value,
-          CI = stats::prop.test(table(var, group), correct = FALSE)$conf.int,
+          CI = stats::prop.test(table(group, var), correct = FALSE)$conf.int,
           CI_name = "CI for difference in proportions derived from a normal (\"Wald\") approximation"
         )
       },
@@ -2859,7 +2927,7 @@ exact McNemar's test.")
         if (n_levels_group == 2 & n_levels_var == 2) {
           list(
             p = ignore_unused_args(stats::chisq.test, arglist)$p.value,
-            CI = stats::prop.test(table(var, group), correct = FALSE)$conf.int,
+            CI = stats::prop.test(table(group, var), correct = FALSE)$conf.int,
             CI_name = "CI for difference in proportions derived from a normal (\"Wald\") approximation"
           )
         } else {
@@ -2987,3 +3055,21 @@ lapply_descr <- function(list, ...) {
     return(invisible(knitr::asis_output(results)))
   }
 }
+
+
+#' Check whether a vector (usually a factor) can be cleanly converted to a numeric
+#'
+#' From https://stackoverflow.com/a/47677916
+#' @param x a vector
+can.be.numeric <- function(x) {
+  stopifnot(is.atomic(x) || is.list(x)) # check if x is a vector
+  numNAs <- sum(is.na(x)) + sum(x=="(Missing)", na.rm = TRUE)
+  numNAs_new <- suppressWarnings(sum(is.na(as.numeric(as.character(x)))))
+  return(numNAs_new == numNAs)
+}
+
+
+
+
+
+

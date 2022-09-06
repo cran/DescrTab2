@@ -346,10 +346,10 @@ test_that("mcnemar.test works with var_options and a character string as indices
 
 test_that("mcnemar.test doesn't work if data is not properly paired",
           {
-          expect_warning(expect_message(expect_message(expect_message(
+          expect_message(expect_message(expect_warning(expect_warning(expect_warning(
             descr(
             dat, "group", test_options = list(paired = TRUE, indices = c(1:1600, 1, 1:1599))
-          )))))})
+          ))))))})
 
 test_that("exact2x2 mcnemar test works",
           {
@@ -375,7 +375,7 @@ test_that("exact2x2 mcnemar test errors if you forget to specify indices",
 
 test_that("exact2x2 doesn't work if data is not properly paired",
           {
-          expect_warning(expect_message(expect_message(expect_message(
+            expect_message(expect_message(expect_warning(expect_warning(
             descr(
             dat, "group", test_options = list(paired = TRUE, exact = TRUE, indices = c(1:1600, 1, 1:1599))
           )))))})
@@ -507,6 +507,38 @@ test_that("t.test 2 sample for factor variables works",
             ),
             NA)
           })
+
+
+test_that("Student t.test 2 sample works",
+          {
+            expect_error(descr(dat, "group", test_options = list(var_equal=TRUE)),
+                         NA)
+          })
+
+test_that("Student t.test 2 sample works if specifically requrested",
+          {
+            expect_error(descr(dat, "group", var_options = list(
+              extra = list(test_override = "Student's two-sample t-test")
+            )) %>%
+              print(silent = TRUE),
+            NA)
+          })
+
+test_that("Student t.test 2 sample for factor variables works",
+          {
+            expect_error(descr(
+              dat %>% mutate(extra = factor(extra)),
+              "group",
+              test_options = list(
+                paired = TRUE,
+                indices = rep(1:10, 2),
+                test_override  = "Student's two-sample t-test"
+              ),
+              format_options = list(print_Total = FALSE)
+            ),
+            NA)
+          })
+
 
 
 
@@ -823,7 +855,7 @@ dat <- tibble(
   var = rep(c(1,5,3,1,8,5,0,12,3,14,3,7), 5)
 )
 test_that("Jonckheere-Terpstra's test works",{
-  expect_error(descr(dat, "group", test_options = list(test_override = "Jonckheere-Terpstra's test")) , NA)
+  expect_warning(descr(dat, "group", test_options = list(test_override = "Jonckheere-Terpstra's test")))
 })
 
 

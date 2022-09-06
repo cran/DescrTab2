@@ -14,15 +14,37 @@ descr(
     DescrTab2:::.mean, sd = DescrTab2:::.sd, median = DescrTab2:::.median, Q1 =
     DescrTab2:::.Q1, Q3 = DescrTab2:::.Q3, min = DescrTab2:::.min, max =
     DescrTab2:::.max),
+  summary_stats_numeric_ord = list(N = DescrTab2:::.factorN, Nmiss =
+    DescrTab2:::.factorNmiss, mean = DescrTab2:::.factormean, sd = DescrTab2:::.factorsd,
+    median = DescrTab2:::.factormedian, Q1 = DescrTab2:::.factorQ1, Q3 =
+    DescrTab2:::.factorQ3, min = DescrTab2:::.factormin, max = DescrTab2:::.factormax),
   summary_stats_cat = list(),
-  format_summary_stats = list(N = function(x) {     format(x, digits = 2, scientific =
-    3) }, mean = function(x) {     format(x, digits = 2, scientific = 3) }, sd =
-    function(x) {     format(x, digits = 2, scientific = 3) }, median = function(x) {    
-    format(x, digits = 2, scientific = 3) }, Q1 = function(x) {     format(x, digits = 2,
-    scientific = 3) }, Q3 = function(x) {     format(x, digits = 2, scientific = 3) },
-    min = function(x) {     format(x, digits = 2, scientific = 3) }, max = function(x) { 
-       format(x, digits = 2, scientific = 3) }, CI = function(x) {     format(x, digits =
-    2, scientific = 3) }),
+  format_summary_stats = list(N = function(x) {
+     format(x, digits = 2, scientific =
+    3)
+ }, mean = function(x) {
+     format(x, digits = 2, scientific = 3)
+ }, sd =
+    function(x) {
+     format(x, digits = 2, scientific = 3)
+ }, median = function(x) {
+ 
+       format(x, digits = 2, scientific = 3)
+ }, Q1 = function(x) {
+     format(x, digits
+    = 2, scientific = 3)
+ }, Q3 = function(x) {
+     format(x, digits = 2, scientific =
+    3)
+ }, min = function(x) {
+     format(x, digits = 2, scientific = 3)
+ }, max =
+    function(x) {
+     format(x, digits = 2, scientific = 3)
+ }, CI = function(x) {
+    
+    format(x, digits = 2, scientific = 3)
+ }),
   format_p = scales::pvalue_format(),
   format_options = list(print_Total = NULL, print_p = TRUE, print_CI = TRUE,
     combine_mean_sd = FALSE, combine_median_Q1_Q3 = FALSE, omit_factor_level = "none",
@@ -30,16 +52,21 @@ descr(
     percent_suffix = "\%", row_percent = FALSE, Nmiss_row_percent = FALSE,
     absolute_relative_frequency_mode = c("both", "only_absolute", "only_relative"),
     omit_missings_in_categorical_var = FALSE, categorical_missing_percent_mode =
-    c("no_missing_percent", "missing_as_regular_category",     
+    c("no_missing_percent", "missing_as_regular_category", 
+    
     "missing_as_separate_category"), caption = NULL, replace_empty_string_with_NA = TRUE,
-    categories_first_summary_stats_second = FALSE),
-  test_options = list(paired = FALSE, nonparametric = FALSE, exact = FALSE, indices =
-    c(), guess_id = FALSE, include_group_missings_in_test = FALSE,
+    categories_first_summary_stats_second = FALSE, max_first_col_width = 7.5),
+  test_options = list(paired = FALSE, nonparametric = FALSE, exact = FALSE, var_equal =
+    FALSE, indices = c(), guess_id = FALSE, include_group_missings_in_test = FALSE,
     include_categorical_missings_in_test = FALSE, test_override = NULL,
     additional_test_args = list(), boschloo_max_n = 200),
-  reshape_rows = list(`Q1 - Q3` = list(args = c("Q1", "Q3"), fun = function(Q1, Q3) {  
-      paste0(Q1, " -- ", Q3) }), `min - max` = list(args = c("min", "max"), fun =
-    function(min, max) {     paste0(min, " -- ", max) })),
+  reshape_rows = list(`Q1 - Q3` = list(args = c("Q1", "Q3"), fun = function(Q1, Q3) {
+ 
+       paste0(Q1, " -- ", Q3)
+ }), `min - max` = list(args = c("min", "max"), fun =
+    function(min, max) {
+     paste0(min, " -- ", max)
+ })),
   ...
 )
 }
@@ -56,6 +83,8 @@ descr(
 These options are specified in this argument. See the details and examples for more explanation.}
 
 \item{summary_stats_cont}{named list of summary statistic functions to be used for numeric variables.}
+
+\item{summary_stats_numeric_ord}{named list of summary statistic function to be used for ordered factor variables which can be converted to numeric.}
 
 \item{summary_stats_cat}{named list of summary statistic function to be used for categorical variables.}
 
@@ -140,13 +169,13 @@ they will become "A": 10 (33\%), "B": 10 (33\%), "(Missing)": 10 (33\% purposes.
 all observations (i.e. #(Missing) / N), but calculates all other catetgory percentages with respect to the non-missing
 observations (e.g. #A / N_nonmissing). This means that if You have three categories: "A" with 10 counts, "B" with 10 counts
 and "(Missing)" with 10 counts, they will become "A": 10 (50\%), "B": 10 (50\%), "(Missing)": 10 (33\%)}
-
-\item{\code{"caption"}}{ adds a table caption to the LaTeX, Word or PDf document}
-  }
  }
+  }
+\item{\code{"caption"}}{ adds a table caption to the LaTeX, Word or PDf document}
 \item{\code{replace_empty_string_with_NA}}{ (logical) controls whether empty strings ("") should be replaced
 with missing value (\code{NA_character_}).}
 \item{\code{categories_first_summary_stats_second}}{ (logical) controls whether the categories should be printed first in the summary statistics table.}
+\item{\code{max_first_col_width}}{ (numeric) controls the maximum width of the first column in LaTeX tables.}
 }
 }
 
@@ -197,6 +226,7 @@ by typing \code{print_test_names()}. Possible choices are:
 \item{\code{"Student's paired t-test"}}{ }
 \item{\code{"Mixed model ANOVA"}}{ }
 \item{\code{"Student's one-sample t-test"}}{ }
+\item{\code{"Student's two-sample t-test"}}{ }
 \item{\code{"Welch's two-sample t-test"}}{ }
 \item{\code{"F-test (ANOVA)"}}{ }
   }

@@ -11,7 +11,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 
-<meta name="date" content="2022-01-20" />
+<meta name="date" content="2022-09-06" />
 
 <title>Maintenance guidance</title>
 
@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function(e) {
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
   ul.task-list{list-style: none;}
     </style>
+
 
 
 
@@ -236,38 +237,96 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 <h1 class="title toc-ignore">Maintenance guidance</h1>
-<h4 class="date">2022-01-20</h4>
+<h4 class="date">2022-09-06</h4>
 
 
 
 <div id="intoduction" class="section level2">
 <h2>Intoduction</h2>
-<p><code>DescrTab2</code> is a powerful package with vast customization options. With this, unfortunately, comes code that has to deal with quite a bit of special cases an exceptions. This document aims to describe the flow of control of the <code>DescrTab2</code> package, so that future generations may continue development and successfully fix potential bugs.</p>
+<p><code>DescrTab2</code> is a powerful package with vast customization
+options. With this, unfortunately, comes code that has to deal with
+quite a bit of special cases an exceptions. This document aims to
+describe the flow of control of the <code>DescrTab2</code> package, so
+that future generations may continue development and successfully fix
+potential bugs.</p>
 </div>
 <div id="flow-of-control" class="section level2">
 <h2>Flow of control</h2>
 <div id="descr" class="section level3">
 <h3>descr</h3>
-<p>The user interfaces mostly with the <code>descr</code> function. <code>descr</code> does all the calculations, i.e. the evaluation of the summary statistics on the data (mean, sd, median, etc. for continuous variables and counts for categorical variables) and the calculation of statistical tests. For this <code>descr</code> calls the <code>descr_cat</code> and <code>descr_cont</code> functions, which evaluate the list of summary statistics on the data. <code>descr_cat</code> then calls <code>test_cat</code> and <code>descr_cont</code> calls <code>test_cont</code>, which calculate appropriate statistical tests. A detailed description for the choice of test can be read in the “Test choice” vignette.</p>
-<p><code>descr</code> returns a <code>DescrList</code> object, which is basically a named list containing all calculation results and the formatting options.</p>
+<p>The user interfaces mostly with the <code>descr</code> function.
+<code>descr</code> does all the calculations, i.e. the evaluation of the
+summary statistics on the data (mean, sd, median, etc. for continuous
+variables and counts for categorical variables) and the calculation of
+statistical tests. For this <code>descr</code> calls the
+<code>descr_cat</code> and <code>descr_cont</code> functions, which
+evaluate the list of summary statistics on the data.
+<code>descr_cat</code> then calls <code>test_cat</code> and
+<code>descr_cont</code> calls <code>test_cont</code>, which calculate
+appropriate statistical tests. A detailed description for the choice of
+test can be read in the “Test choice” vignette.</p>
+<p><code>descr</code> returns a <code>DescrList</code> object, which is
+basically a named list containing all calculation results and the
+formatting options.</p>
 </div>
 <div id="print" class="section level3">
 <h3>print</h3>
-<p>To turn a <code>DescrList</code> object into pretty output, the object has to be passed to the print function. <code>print</code> is a generic function. This means that if a <code>DescrList</code> object is passed to <code>print</code>, the specialized <code>print.DescrList</code> function will be invoked automatically.</p>
+<p>To turn a <code>DescrList</code> object into pretty output, the
+object has to be passed to the print function. <code>print</code> is a
+generic function. This means that if a <code>DescrList</code> object is
+passed to <code>print</code>, the specialized
+<code>print.DescrList</code> function will be invoked automatically.</p>
 <div id="preprocessing" class="section level4">
 <h4>Preprocessing</h4>
-<p>Since the proper output format is highly document type dependent, <code>print.DescrList</code> creates output in two steps. The first step is independent of the output format: The creation of a <code>DescrPrintObj</code> by calling the <code>create_printObj</code> function.</p>
-<p>In this function, proper formatting is applied to the results in the <code>DescrList</code> and the formatted values are saved inside a tibble. Formatting in this case means converting numbers to characters, reducing the number of decimal digits, combining variables like “Q1” and “Q3” into “Q1 - Q3”, formatting small p values to display as “&lt;0.001” and adding “%” values to categorical variables.</p>
-<p>Somewhat of an exception is the case <code>printFormat=&quot;numeric&quot;</code>. Here, numbers are not converted characters and consequently very little formatting can be applied.</p>
-<p>The formatting in <code>create_printObj</code> is done by iterating over all variables in the <code>DescrList</code> object and creating an appropriate sub-table by calling one of <code>create_numeric_subtable.cat_summary</code>, <code>create_numeric_subtable.cont_summary</code>, <code>create_character_subtable.cat_summary</code> or <code>create_character_subtable.cont_summary</code>. Whether <code>create_numeric_subtable</code> or <code>create_character_subtable</code> is called is determined by the <code>printFormat</code> option (all options lead to <code>create_character_subtable</code> except <code>printFormat=&quot;numeric</code>). Whether <code>.cat_summary</code> or <code>.cont_summary</code> is called depends on the type of variable. The sub-tables are then concatenated to a master table.</p>
+<p>Since the proper output format is highly document type dependent,
+<code>print.DescrList</code> creates output in two steps. The first step
+is independent of the output format: The creation of a
+<code>DescrPrintObj</code> by calling the <code>create_printObj</code>
+function.</p>
+<p>In this function, proper formatting is applied to the results in the
+<code>DescrList</code> and the formatted values are saved inside a
+tibble. Formatting in this case means converting numbers to characters,
+reducing the number of decimal digits, combining variables like “Q1” and
+“Q3” into “Q1 - Q3”, formatting small p values to display as “&lt;0.001”
+and adding “%” values to categorical variables.</p>
+<p>Somewhat of an exception is the case
+<code>printFormat=&quot;numeric&quot;</code>. Here, numbers are not converted
+characters and consequently very little formatting can be applied.</p>
+<p>The formatting in <code>create_printObj</code> is done by iterating
+over all variables in the <code>DescrList</code> object and creating an
+appropriate sub-table by calling one of
+<code>create_numeric_subtable.cat_summary</code>,
+<code>create_numeric_subtable.cont_summary</code>,
+<code>create_character_subtable.cat_summary</code> or
+<code>create_character_subtable.cont_summary</code>. Whether
+<code>create_numeric_subtable</code> or
+<code>create_character_subtable</code> is called is determined by the
+<code>printFormat</code> option (all options lead to
+<code>create_character_subtable</code> except
+<code>printFormat=&quot;numeric</code>). Whether <code>.cat_summary</code> or
+<code>.cont_summary</code> is called depends on the type of variable.
+The sub-tables are then concatenated to a master table.</p>
 </div>
 <div id="postprocessing" class="section level4">
 <h4>Postprocessing</h4>
-<p>The <code>DescrPintObj</code> is the transformed into appropriate output format by calling one of <code>print_tex</code>, <code>print_html</code>, <code>print_word</code>, <code>print_console</code> or <code>print_numeric</code>.</p>
-<p><code>print_console</code> basically prints the tibble that is produces by <code>create_printObj</code> using a slightly modified version of the default method for printing tibbles.</p>
-<p><code>print_numeric</code> basically prints the tibble produces by <code>create_printObj</code> if <code>printFormat=&quot;numeric&quot;</code> was specified.</p>
-<p><code>print_tex</code> and <code>print_html</code> use kableExtra to convert the tibble from <code>create_printObj</code> into raw tex or html output. Some special formatting has to be applied to these outputs to accomodate for superscripts and to escape special LaTeX characters.</p>
-<p><code>print_word</code> produces a flextable object from the tibble returned by <code>create_printObj</code>. flextables play relatively nicely with word.</p>
+<p>The <code>DescrPintObj</code> is the transformed into appropriate
+output format by calling one of <code>print_tex</code>,
+<code>print_html</code>, <code>print_word</code>,
+<code>print_console</code> or <code>print_numeric</code>.</p>
+<p><code>print_console</code> basically prints the tibble that is
+produces by <code>create_printObj</code> using a slightly modified
+version of the default method for printing tibbles.</p>
+<p><code>print_numeric</code> basically prints the tibble produces by
+<code>create_printObj</code> if <code>printFormat=&quot;numeric&quot;</code> was
+specified.</p>
+<p><code>print_tex</code> and <code>print_html</code> use kableExtra to
+convert the tibble from <code>create_printObj</code> into raw tex or
+html output. Some special formatting has to be applied to these outputs
+to accomodate for superscripts and to escape special LaTeX
+characters.</p>
+<p><code>print_word</code> produces a flextable object from the tibble
+returned by <code>create_printObj</code>. flextables play relatively
+nicely with word.</p>
 </div>
 </div>
 </div>
